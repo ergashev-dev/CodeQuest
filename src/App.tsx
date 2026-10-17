@@ -17,6 +17,10 @@ export default function App() {
   const setPaused = useGameStore((state) => state.setPaused)
 
   useEffect(() => {
+    if (import.meta.env.DEV && new URLSearchParams(window.location.search).has('terminal')) {
+      setScreen('game')
+      useGameStore.getState().setTerminalOpen(true)
+    }
     void loadGame().then((save) => {
       setHasSave(Boolean(save))
       if (save) useGameStore.getState().hydrate(save)

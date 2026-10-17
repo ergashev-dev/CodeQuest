@@ -5,16 +5,19 @@ CodeQuest — dasturlashni fantaziya sarguzashtining haqiqiy mexanikasiga aylant
 ## Ishlaydigan funksiyalar
 
 - Kinematik landing, o‘zbekcha intro va animatsiyali character creator
+- ImageGen asosida yaratilgan 4×4 hand-painted qahramon sprite-sheeti
 - Phaser 3 asosidagi 2400×1600 ochiq Greenhaven hududi
 - WASD harakat, Shift sprint, Space dash, mouse sword attack
-- Kolliziyalar, silliq kamera, procedural daraxtlar, uylar, suv va firefly effektlari
-- Idle/chase/attack/dead holatli Slime enemy
+- Kolliziyalar, silliq kamera, qatlamli o‘simliklar, detallangan uylar, soyalar, jonli suv va firefly effektlari
+- Patrol/chase/attack/recover/dead holatli Slime enemy, HP indikatori va knockback
 - Elder Syntax NPC, checkpoint va kontekstli `E` interaksiyasi
-- Monaco Editor ko‘rinishidagi sehrli terminal
+- Yengil, fokus va keyboard muammolaridan himoyalangan sehrli JavaScript terminali
 - QuickJS WebAssembly Web Worker ichida izolyatsiyalangan real JavaScript bajarilishi
+- Terminal CDN yoki internetga bog‘liq emas
 - 1.5 soniyalik timeout; DOM, LocalStorage, cookie va network sandboxga ochilmagan
 - To‘g‘ri koddan keyin kristall yonadi, fizik darvoza ochiladi, XP va tangalar beriladi
 - IndexedDB versioned save, avtomatik checkpoint va Continue tugmasi
+- O‘limdan keyin checkpoint respawn, dash invulnerability va alohida jang cooldown’lari
 - Responsive fantasy UI, health/mana/XP HUD va pause menyusi
 
 ## O‘rnatish va ishga tushirish
@@ -42,6 +45,8 @@ npm run preview
 | Mouse chap tugmasi | Qilich hujumi |
 | E | NPC, terminal yoki checkpoint bilan aloqa |
 | Escape | Pauza |
+
+Qahramon animatsiya tezligi: idle — 6 FPS, walk — 8 FPS, sword attack — 12 FPS, dash — 14 FPS.
 
 ## Kod challenge qanday ishlaydi
 

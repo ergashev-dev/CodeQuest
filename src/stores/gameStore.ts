@@ -6,13 +6,14 @@ interface GameState extends SaveData {
   terminalOpen:boolean; paused:boolean; interaction:string; toast:string;
   setCharacter:(name:string,appearance:Appearance)=>void; setTerminalOpen:(open:boolean)=>void; setPaused:(paused:boolean)=>void;
   setInteraction:(text:string)=>void; setToast:(text:string)=>void; setPosition:(position:Position)=>void;
-  damage:(amount:number)=>void; restoreCrystal:()=>void; defeatEnemy:()=>void; hydrate:(save:SaveData)=>void; reset:()=>void;
+  damage:(amount:number)=>void; respawn:()=>void; restoreCrystal:()=>void; defeatEnemy:()=>void; hydrate:(save:SaveData)=>void; reset:()=>void;
 }
 export const useGameStore = create<GameState>((set) => ({
   version:1,...initial,terminalOpen:false,paused:false,interaction:'',toast:'',
   setCharacter:(name,appearance)=>set({name:name.trim()||'Qahramon',appearance}), setTerminalOpen:(terminalOpen)=>set({terminalOpen}),
   setPaused:(paused)=>set({paused}),setInteraction:(interaction)=>set({interaction}),setToast:(toast)=>set({toast}),setPosition:(position)=>set({position}),
   damage:(amount)=>set((s)=>({health:Math.max(0,s.health-amount)})),
+  respawn:()=>set((s)=>({health:100,mana:70,position:{x:610,y:960},coins:Math.max(0,s.coins-5),toast:'Checkpointda qayta uyg‘ondingiz. −5 tanga'})),
   restoreCrystal:()=>set((s)=>({crystalRestored:true,xp:Math.max(s.xp,60),coins:s.crystalRestored?s.coins:s.coins+30,toast:'Kristall uyg‘ondi! +60 XP  +30 tanga'})),
   defeatEnemy:()=>set((s)=>({enemyDefeated:true,xp:s.enemyDefeated?s.xp:s.xp+25,coins:s.enemyDefeated?s.coins:s.coins+8,toast:'O‘rmon shilimshig‘i yengildi! +25 XP'})),
   hydrate:(save)=>set({...save}), reset:()=>set({version:1,...initial,terminalOpen:false,paused:false,interaction:'',toast:''}),
