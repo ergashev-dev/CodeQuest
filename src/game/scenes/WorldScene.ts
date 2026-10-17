@@ -35,8 +35,8 @@ export class WorldScene extends Phaser.Scene {
 
   preload() {
     this.load.spritesheet('hero-sheet','/assets/characters/hero-spritesheet-source.png',{frameWidth:384,frameHeight:256})
+    this.load.spritesheet('hero-directional','/assets/characters/hero-directional-v2.png',{frameWidth:384,frameHeight:256})
     this.load.spritesheet('environment-atlas','/assets/environment/greenhaven-atlas-4x4.png',{frameWidth:324,frameHeight:304})
-    this.load.spritesheet('terrain-atlas','/assets/environment/greenhaven-terrain-tiles-4x4.png',{frameWidth:314,frameHeight:314})
     this.load.spritesheet('elder-sheet','/assets/npcs/elder-syntax-sheet-4x4.png',{frameWidth:316,frameHeight:312})
     this.load.spritesheet('slime-sheet','/assets/enemies/forest-slime-sheet-v1.png',{frameWidth:384,frameHeight:256})
     this.load.spritesheet('forge-sheet','/assets/npcs/blacksmith-forge-sheet-4x4.png',{frameWidth:351,frameHeight:281})
@@ -46,7 +46,6 @@ export class WorldScene extends Phaser.Scene {
   }
 
   create() {
-    this.makeTextures()
     this.physics.world.setBounds(0, 0, 2400, 1600)
     this.cameras.main.setBounds(0, 0, 2400, 1600)
     this.drawTerrain()
@@ -55,8 +54,10 @@ export class WorldScene extends Phaser.Scene {
     this.addVillage()
 
     const state = useGameStore.getState()
-    this.anims.create({key:'hero-idle',frames:this.anims.generateFrameNumbers('hero-sheet',{start:0,end:3}),frameRate:6,repeat:-1})
-    this.anims.create({key:'hero-walk',frames:this.anims.generateFrameNumbers('hero-sheet',{start:4,end:7}),frameRate:8,repeat:-1})
+    this.anims.create({key:'hero-idle',frames:this.anims.generateFrameNumbers('hero-directional',{start:0,end:3}),frameRate:5,repeat:-1})
+    this.anims.create({key:'hero-walk-front',frames:this.anims.generateFrameNumbers('hero-directional',{start:4,end:7}),frameRate:8,repeat:-1})
+    this.anims.create({key:'hero-walk-back',frames:this.anims.generateFrameNumbers('hero-directional',{start:8,end:11}),frameRate:8,repeat:-1})
+    this.anims.create({key:'hero-walk-side',frames:this.anims.generateFrameNumbers('hero-directional',{start:12,end:15}),frameRate:9,repeat:-1})
     this.anims.create({key:'hero-attack',frames:this.anims.generateFrameNumbers('hero-sheet',{start:8,end:11}),frameRate:12,repeat:0})
     this.anims.create({key:'hero-dash',frames:this.anims.generateFrameNumbers('hero-sheet',{start:12,end:15}),frameRate:14,repeat:0})
     this.anims.create({key:'slime-idle',frames:this.anims.generateFrameNumbers('slime-sheet',{start:0,end:3}),frameRate:6,repeat:-1})
@@ -68,7 +69,7 @@ export class WorldScene extends Phaser.Scene {
     this.anims.create({key:'lady-idle',frames:this.anims.generateFrameNumbers('lady-sheet',{start:0,end:3}),frameRate:5,repeat:-1})
     this.anims.create({key:'merchant-idle',frames:this.anims.generateFrameNumbers('merchant-sheet',{start:0,end:3}),frameRate:6,repeat:-1})
     for(let row=0;row<4;row++)this.anims.create({key:`villager-${row}-walk`,frames:this.anims.generateFrameNumbers('villagers-sheet',{start:row*4,end:row*4+3}),frameRate:7,repeat:-1})
-    this.player = this.physics.add.sprite(state.position.x, state.position.y, 'hero-sheet',0).setScale(.31).setCollideWorldBounds(true)
+    this.player = this.physics.add.sprite(state.position.x, state.position.y, 'hero-directional',0).setScale(.31).setCollideWorldBounds(true)
     this.player.body!.setSize(104, 112).setOffset(140, 96)
     this.player.play('hero-idle')
     this.player.setDepth(this.player.y)
@@ -84,7 +85,7 @@ export class WorldScene extends Phaser.Scene {
     this.physics.add.collider(this.player, this.enemy)
     this.cameras.main.startFollow(this.player, true, .075, .075)
     this.cameras.main.setZoom(1.12)
-    this.cameras.main.roundPixels = false
+    this.cameras.main.roundPixels = true
 
     this.cursors = this.input.keyboard!.createCursorKeys()
     this.keys = this.input.keyboard!.addKeys({ w:'W', a:'A', s:'S', d:'D', shift:'SHIFT', e:'E', esc:'ESC' }) as typeof this.keys
@@ -104,56 +105,33 @@ export class WorldScene extends Phaser.Scene {
     }})
   }
 
-  private makeTextures() {
-    const g = this.make.graphics({x:0,y:0}, false)
-
-    g.fillStyle(0x07130f,.28).fillEllipse(40,66,70,18)
-    g.fillStyle(0x25734d).fillEllipse(40,50,72,48)
-    g.fillStyle(0x53b77a).fillEllipse(40,41,66,43)
-    g.fillStyle(0x83d399,.7).fillEllipse(29,35,26,14)
-    g.fillStyle(0xf0f7dc).fillCircle(28,45,7).fillCircle(52,45,7)
-    g.fillStyle(0x13251d).fillCircle(30,46,3).fillCircle(50,46,3)
-    g.lineStyle(2,0x183a29).beginPath().arc(40,54,10,.2,2.9).strokePath()
-    g.generateTexture('slime',80,78); g.clear()
-
-    g.fillStyle(0x07130f,.24).fillEllipse(48,93,78,18)
-    g.fillStyle(0x5a3b25).fillRoundedRect(40,52,15,43,5)
-    g.fillStyle(0x173c2b).fillCircle(48,45,38).fillCircle(25,58,27).fillCircle(70,59,29)
-    g.fillStyle(0x2e6945).fillCircle(43,33,30).fillCircle(68,46,23)
-    g.fillStyle(0x4b8c58,.7).fillCircle(32,28,13).fillCircle(57,20,15)
-    g.generateTexture('tree',96,104); g.clear()
-
-    g.fillStyle(0x0a1611,.22).fillEllipse(46,62,84,16)
-    g.fillStyle(0x766e5d).fillRoundedRect(4,8,84,52,17)
-    g.fillStyle(0x9a917b).fillRoundedRect(10,7,70,38,15)
-    g.lineStyle(3,0x625a4b).lineBetween(24,13,16,38).lineBetween(62,9,73,33)
-    g.generateTexture('rock',92,72); g.clear()
-
-    g.fillStyle(0x7fbb64).fillCircle(10,14,6).fillCircle(21,10,7).fillCircle(30,15,6)
-    g.fillStyle(0x365e39).fillRect(18,14,3,18)
-    g.generateTexture('bush',40,36); g.destroy()
-  }
-
   private drawTerrain() {
-    this.add.rectangle(1200,800,2400,1600,0x397a4e).setDepth(-20)
-    for(let y=0;y<6;y++)for(let x=0;x<8;x++)this.add.image(157+x*314,157+y*314,'terrain-atlas',(x+y*3)%4).setDepth(-19).setAlpha(.82)
+    this.add.rectangle(1200,800,2400,1600,0x356f48).setDepth(-20)
     const ground=this.add.graphics().setDepth(-19)
-    for(let i=0;i<420;i++){
+    ground.fillStyle(0x4f8756,.32).fillRoundedRect(70,360,2260,1170,120)
+    ground.fillStyle(0x2b6242,.3).fillEllipse(1850,1180,920,600)
+    ground.fillStyle(0x64935c,.2).fillEllipse(650,1240,980,520)
+    for(let i=0;i<135;i++){
       const x=Phaser.Math.Between(0,2400), y=Phaser.Math.Between(330,1600)
       const shade=i%3===0?0x275f3f:i%3===1?0x4d8a53:0x78a65b
-      ground.fillStyle(shade,Phaser.Math.FloatBetween(.12,.27)).fillCircle(x,y,Phaser.Math.Between(8,26))
+      ground.fillStyle(shade,Phaser.Math.FloatBetween(.08,.18)).fillCircle(x,y,Phaser.Math.Between(10,34))
     }
     const path=this.add.graphics().setDepth(-16)
-    path.lineStyle(174,0x9b865b,.42); path.beginPath(); path.moveTo(120,1030); path.lineTo(790,730); path.lineTo(1390,820); path.lineTo(2260,520); path.strokePath()
-    path.lineStyle(142,0xc0aa75,.92); path.strokePath(); path.lineStyle(3,0xe4d39a,.28); path.strokePath()
+    const roadCurve=new Phaser.Curves.Spline([new Phaser.Math.Vector2(-80,1130),new Phaser.Math.Vector2(390,960),new Phaser.Math.Vector2(780,790),new Phaser.Math.Vector2(1120,735),new Phaser.Math.Vector2(1430,790),new Phaser.Math.Vector2(1810,760),new Phaser.Math.Vector2(2480,480)])
+    const roadPoints=roadCurve.getSpacedPoints(72)
+    const traceRoad=()=>path.strokePoints(roadPoints,false,false)
+    path.lineStyle(164,0x665438,.38);traceRoad()
+    path.lineStyle(136,0xb6a26f,1);traceRoad()
+    path.lineStyle(112,0xc7b77f,.7);traceRoad()
+    path.lineStyle(3,0xe9ddb0,.18);traceRoad()
 
     const water=this.add.graphics().setDepth(-15)
     water.fillStyle(0x236f78,.98).fillRect(0,70,2400,255)
     water.fillStyle(0x65b6af,.22).fillRect(0,84,2400,32)
-    for(let x=0;x<2400;x+=90){const wave=this.add.rectangle(x,Phaser.Math.Between(135,290),52,2,0xa9e0d3,.32).setDepth(-14);this.tweens.add({targets:wave,x:x+45,alpha:.08,yoyo:true,repeat:-1,duration:Phaser.Math.Between(1800,3200)})}
+    for(let x=0;x<2400;x+=190){const wave=this.add.rectangle(x,Phaser.Math.Between(135,290),72,2,0xa9e0d3,.28).setDepth(-14);this.tweens.add({targets:wave,x:x+35,alpha:.08,yoyo:true,repeat:-1,duration:Phaser.Math.Between(2200,3600)})}
     this.add.ellipse(1820,382,470,110,0x183d2e,.18).setDepth(-13)
 
-    for(let i=0;i<210;i++){
+    for(let i=0;i<72;i++){
       const x=Phaser.Math.Between(30,2370),y=Phaser.Math.Between(355,1570)
       if(x>250&&x<1550&&y>480&&y<1100) continue
       const flower=this.add.circle(x,y,Phaser.Math.Between(2,4),i%4===0?0xf2c75d:i%4===1?0xdba7d3:0xa7d58b,.72).setDepth(-10)
@@ -200,10 +178,10 @@ export class WorldScene extends Phaser.Scene {
     this.tweens.add({targets:glow,scale:1.45,alpha:.02,yoyo:true,repeat:-1,duration:1500})
     this.tweens.add({targets:gem,y:'-=8',yoyo:true,repeat:-1,duration:1700,ease:'Sine.inOut'})
 
-    this.add.rectangle(1395,610,34,190,0x625b50).setStrokeStyle(4,0xa69c7b).setDepth(608)
-    this.add.rectangle(1505,610,34,190,0x625b50).setStrokeStyle(4,0xa69c7b).setDepth(608)
-    this.add.rectangle(1450,518,145,28,0x777063).setStrokeStyle(4,0xb9a97d).setDepth(608)
-    this.gateDoor=this.add.rectangle(1450,620,82,155,0x2c2830).setStrokeStyle(5,0x8d6c97).setDepth(609)
+    this.add.rectangle(1395,610,40,190,0x5a3a25).setStrokeStyle(5,0x9b7443).setDepth(608)
+    this.add.rectangle(1505,610,40,190,0x5a3a25).setStrokeStyle(5,0x9b7443).setDepth(608)
+    this.add.triangle(1450,510,-90,28,0,-32,90,28,0x31543b).setStrokeStyle(6,0x8d7042).setDepth(608)
+    this.gateDoor=this.add.rectangle(1450,620,82,155,0x3e2b22).setStrokeStyle(5,0xb38a52).setDepth(609)
     this.physics.add.existing(this.gateDoor,true);this.obstacles.add(this.gateDoor)
 
     const checkpoint=this.add.container(610,960).setDepth(960)
@@ -213,7 +191,7 @@ export class WorldScene extends Phaser.Scene {
     this.tweens.add({targets:checkpointStar,angle:360,duration:11000,repeat:-1});this.tweens.add({targets:checkpointGlow,scale:1.4,alpha:.03,yoyo:true,repeat:-1,duration:1200})
     this.registry.set('interactables',[npc,this.crystal,checkpoint])
 
-    for(let i=0;i<28;i++){const firefly=this.add.circle(Phaser.Math.Between(880,1660),Phaser.Math.Between(430,1050),Phaser.Math.Between(2,3),0xd7ff9b,.8).setDepth(1800);this.tweens.add({targets:firefly,x:`+=${Phaser.Math.Between(-65,65)}`,y:`+=${Phaser.Math.Between(-65,65)}`,alpha:.12,yoyo:true,repeat:-1,duration:Phaser.Math.Between(1600,3400)})}
+    for(let i=0;i<12;i++){const firefly=this.add.circle(Phaser.Math.Between(880,1660),Phaser.Math.Between(430,1050),Phaser.Math.Between(2,3),0xd7ff9b,.8).setDepth(1800);this.tweens.add({targets:firefly,x:`+=${Phaser.Math.Between(-65,65)}`,y:`+=${Phaser.Math.Between(-65,65)}`,alpha:.12,yoyo:true,repeat:-1,duration:Phaser.Math.Between(2100,3800)})}
   }
 
   update(time:number) {
@@ -230,7 +208,10 @@ export class WorldScene extends Phaser.Scene {
     this.player.setFlipX(this.facing.x<0);this.player.setDepth(Math.floor(this.player.y))
     if(time<this.dashUntil)this.player.play('hero-dash',true)
     else if(time<this.attackUntil)this.player.play('hero-attack',true)
-    else if(moving)this.player.play('hero-walk',true)
+    else if(moving){
+      if(Math.abs(this.facing.y)>Math.abs(this.facing.x))this.player.play(this.facing.y<0?'hero-walk-back':'hero-walk-front',true)
+      else this.player.play('hero-walk-side',true)
+    }
     else this.player.play('hero-idle',true)
     const shadow=this.children.getByName('player-shadow') as Phaser.GameObjects.Ellipse;shadow.setPosition(this.player.x,this.player.y+29).setDepth(this.player.depth-1)
     if(moving&&time>this.footstepReady){this.footstepReady=time+180;const dust=this.add.circle(this.player.x-this.facing.x*18,this.player.y+25,7,0xdac58d,.24).setDepth(this.player.depth-2);this.tweens.add({targets:dust,alpha:0,scale:1.8,duration:350,onComplete:()=>dust.destroy()})}
